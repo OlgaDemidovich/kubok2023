@@ -17,14 +17,15 @@ def intersects(bbox1, bbox2):
 
 def template(img):
     if abs(img.shape[0] - img.shape[1]) < 3:
-        img = cv2.resize(img, (38, 38), None, 0.5, 0.5)
+        img = cv2.resize(img, (138, 138), None, 0.5, 0.5)
         etalon = cv2.imread('1.png', 0)
+        etalon = cv2.resize(etalon, (138, 138), None, 0.5, 0.5)
         diff = 255 - cv2.absdiff(img, etalon)
         res = []
         for u in diff:
             res.append(sum(u))
         # print('second', sum(res) / (38 * 38 * 255))
-        coincidence = sum(res) / (38 * 38 * 255)
+        coincidence = sum(res) / (138 * 138 * 255)
         # cv2.putText(frame, str(coincidence), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
         return coincidence
     return 0
@@ -90,7 +91,7 @@ def detect_defective_parts(video) -> list:
                 if intersects(bbox, old_bbox):
                     num_id = old_num_id
                     nut = thresh[y:y2, x:x2]
-                    # cv2.putText(frame, str(nut.shape), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
+                    cv2.putText(frame, str(nut.shape), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
                     contours_.append(cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0])
                     if num_id not in coincidence:
                         coincidence[num_id] = [template(nut)]
