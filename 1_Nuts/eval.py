@@ -16,11 +16,13 @@ def intersects(bbox1, bbox2):
 
 
 def template(img):
-    if abs(img.shape[0] - img.shape[1]) < 3:
+    if abs(img.shape[0] - img.shape[1]) < 6:
         img = cv2.resize(img, (138, 138), None, 0.5, 0.5)
         etalon = cv2.imread('1.png', 0)
         etalon = cv2.resize(etalon, (138, 138), None, 0.5, 0.5)
         diff = 255 - cv2.absdiff(img, etalon)
+        # cv2.imshow('diff', diff)
+        # cv2.waitKey(0)
         res = []
         for u in diff:
             res.append(sum(u))
@@ -55,7 +57,6 @@ def detect_defective_parts(video) -> list:
     nuts = dict()
     nuts_img = []
     coincidence = dict()
-    contours_ = []
     result = []  # пустой список для засенения результата
     while True:  # цикл чтения кадров из видео
         status, frame = video.read()  # читаем кадр
@@ -72,7 +73,8 @@ def detect_defective_parts(video) -> list:
 
         thresh = cv2.inRange(blurred_frame, (0, 0, 0), (100, 100, 100))
 
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL,
+                                       cv2.CHAIN_APPROX_SIMPLE)
 
         for cnt in contours:
             bbox = cv2.boundingRect(cnt)
@@ -91,12 +93,13 @@ def detect_defective_parts(video) -> list:
                 if intersects(bbox, old_bbox):
                     num_id = old_num_id
                     nut = thresh[y:y2, x:x2]
-                    cv2.putText(frame, str(nut.shape), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
-                    contours_.append(cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0])
+                    cv2.putText(frame, str(nut.shape), (x, y),
+                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
                     if num_id not in coincidence:
                         coincidence[num_id] = [template(nut)]
                     else:
-                        coincidence[num_id] = coincidence[num_id] + [template(nut)]
+                        coincidence[num_id] = coincidence[num_id] + [
+                            template(nut)]
                     nuts[num_id] = bbox
                     break
 
@@ -108,7 +111,6 @@ def detect_defective_parts(video) -> list:
             if num_id is not None and y >= zone_end:
                 nuts[num_id] = (-50, -50, -1, -1)
                 coincidence[num_id] = coincidence[num_id] + [template(nut)]
-                num_id = None
 
         # cv2.line(frame, (0, zone_start), (frame_w, zone_start), (0, 0, 255))
         # cv2.line(frame, (0, zone_end), (frame_w, zone_end), (0, 0, 255))
@@ -117,7 +119,8 @@ def detect_defective_parts(video) -> list:
         #     cv2.destroyAllWindows()
         #     quit()
     for value in coincidence.values():
-        print(np.array(value).mean())
-        result.append(0 if np.array(value).mean() > 0.9 else 1)
+        m = np.array(value).mean()
+        print(m)
+        result.append(1 if m < 0.91 else 0)
 
     return result
