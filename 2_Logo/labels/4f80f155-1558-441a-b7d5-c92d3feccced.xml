@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>4f80f155-1558-441a-b7d5-c92d3feccced.jpg</filename>
+	<path>D:\inbox\Документы\Документы\__Python__\kubok2023\2.Logo\images\4f80f155-1558-441a-b7d5-c92d3feccced.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1280</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>avt</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>327</xmin>
+			<ymin>109</ymin>
+			<xmax>905</xmax>
+			<ymax>553</ymax>
+		</bndbox>
+	</object>
+</annotation>

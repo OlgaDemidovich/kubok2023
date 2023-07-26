@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>7c349b26-e253-4cce-afb5-24e8b7fb3c2e.jpg</filename>
+	<path>D:\inbox\Документы\Документы\__Python__\kubok2023\2.Logo\images\7c349b26-e253-4cce-afb5-24e8b7fb3c2e.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1280</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>kruzhok</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>36</xmin>
+			<ymin>147</ymin>
+			<xmax>521</xmax>
+			<ymax>631</ymax>
+		</bndbox>
+	</object>
+</annotation>

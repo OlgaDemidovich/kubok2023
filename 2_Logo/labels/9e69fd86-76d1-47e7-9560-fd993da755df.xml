@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>9e69fd86-76d1-47e7-9560-fd993da755df.jpg</filename>
+	<path>D:\inbox\Документы\Документы\__Python__\kubok2023\2.Logo\images\9e69fd86-76d1-47e7-9560-fd993da755df.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1280</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>python</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>125</xmin>
+			<ymin>400</ymin>
+			<xmax>405</xmax>
+			<ymax>687</ymax>
+		</bndbox>
+	</object>
+</annotation>

@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>d9e65bb9-5168-42a8-80f6-09c01b2f1571.jpg</filename>
+	<path>D:\inbox\Документы\Документы\__Python__\kubok2023\2.Logo\images\d9e65bb9-5168-42a8-80f6-09c01b2f1571.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1280</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>altair</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>36</xmin>
+			<ymin>258</ymin>
+			<xmax>488</xmax>
+			<ymax>705</ymax>
+		</bndbox>
+	</object>
+</annotation>
