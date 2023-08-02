@@ -16,7 +16,7 @@ def intersects(bbox1, bbox2):
 
 
 def template(img):
-    if abs(img.shape[0] - img.shape[1]) < 6:
+    if abs(img.shape[0] - img.shape[1]) < 10:
         img = cv2.resize(img, (138, 138), None, 0.5, 0.5)
         etalon = cv2.imread('1.png', 0)
         etalon = cv2.resize(etalon, (138, 138), None, 0.5, 0.5)
@@ -122,5 +122,6 @@ def detect_defective_parts(video) -> list:
         m = np.array(value).mean()
         print(m)
         result.append(1 if m < 0.91 else 0)
+
 
     return result

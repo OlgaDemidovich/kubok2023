@@ -1,0 +1,26 @@
+<annotation>
+	<folder>images</folder>
+	<filename>365aefb1-3e28-424a-96cb-cbd48dcf8404e.jpg</filename>
+	<path>D:\inbox\Документы\Документы\__Python__\kubok2023\2_Logo\images\365aefb1-3e28-424a-96cb-cbd48dcf8404e.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1280</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>cpp</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>613</xmin>
+			<ymin>240</ymin>
+			<xmax>1035</xmax>
+			<ymax>683</ymax>
+		</bndbox>
+	</object>
+</annotation>
