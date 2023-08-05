@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import cv2
 import numpy as np
+# import keras
+import tensorflow as tf
+from tensorflow import keras
 # TODO: Допишите импорт библиотек, которые собираетесь использовать
 
 def load_models():
@@ -15,7 +18,7 @@ def load_models():
 
     # TODO: Отредактируйте функцию по своему усмотрению.
     # Модель нейронной сети, загрузите на онайн-платформу вместе с eval.py.
-    
+
     # Пример загрузки моделей из файлов
     # Yolo-модели
     # net = cv2.dnn.readNetFromDarknet('yolo.cfg', 'yolo.weights')
@@ -24,15 +27,15 @@ def load_models():
     # models = [yolo_model]
 
     # Пример загрузки модели TensorFlow (не забудьте импортировать библиотеку tensorflow)
-    # tf_model = tf.keras.models.load_model('model.h5')
-    # models.append(tf_model)
-    # models = [yolo_model]
+    tf_model = keras.models.load_model('MultiClas_Conv_v2.h5')
+    models = tf_model
 
-    models = []
+    # models = torch.hub.load('ultralytics/yolov5', 'custom', path='best.pt',
+    #                        force_reload=True)
     return models
 
 
-def predict_sign(image, models) -> str:
+def predict_sign(image, model) -> str:
     """
         Функция для классификации знаков дорожного движения.
 
@@ -63,10 +66,15 @@ def predict_sign(image, models) -> str:
     # и для каждого тестового изображения будет вызывать функцию predict_sign()
     # Все остальные функции должны вызываться из вышеперечисленных.
 
-    # My_model = models[0]
-    # image = np.expand_dims(image)
-    # output = My_model.predict(image)[0]
-    # label = interpreter_output(output) # интерпретируйте вывод модели и получите тесктовое название знака
-    # return label
+    image1 = cv2.resize(image, (32, 32)) / 255
+    image1 = np.expand_dims(image1,
+                            axis=0)  # сеть принимает на вход изображение с добавленным измерением, посмотрите как меняется форма массива после этой команды
+    pred = model.predict(image1)
 
-    return 'stop'
+    class_names = ["road_works", "parking", "no_entry", "pedestrian_crossing",
+                   "movement_prohibition", "artificial_roughness", "give_way",
+                   "stop"]
+    class_index = np.argmax(pred[0])
+    res = class_names[class_index]
+
+    return res

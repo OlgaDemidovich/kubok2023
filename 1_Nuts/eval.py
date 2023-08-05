@@ -93,8 +93,8 @@ def detect_defective_parts(video) -> list:
                 if intersects(bbox, old_bbox):
                     num_id = old_num_id
                     nut = thresh[y:y2, x:x2]
-                    cv2.putText(frame, str(nut.shape), (x, y),
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
+                    # cv2.putText(frame, str(nut.shape), (x, y),
+                    #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
                     if num_id not in coincidence:
                         coincidence[num_id] = [template(nut)]
                     else:
