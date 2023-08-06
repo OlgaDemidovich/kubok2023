@@ -50,7 +50,9 @@ def detect_logo(image) -> Tuple[str, Tuple]:
     # Алгоритм проверки будет вызывать функцию detect_logo, остальные функции должны вызываться из неё.
     label = "avt"
     names = ['cpp', 'python', 'kruzhok', 'altair', 'avt']
+
     for name in names:
+
         label, bbox = detect(image, name)
         if bbox:
             break

@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from tensorflow import keras
 
 
 def intersects(bbox1, bbox2):
@@ -15,22 +16,30 @@ def intersects(bbox1, bbox2):
     return inter_area > 0
 
 
-def template(img):
-    if abs(img.shape[0] - img.shape[1]) < 10:
-        img = cv2.resize(img, (138, 138), None, 0.5, 0.5)
-        etalon = cv2.imread('1.png', 0)
-        etalon = cv2.resize(etalon, (138, 138), None, 0.5, 0.5)
-        diff = 255 - cv2.absdiff(img, etalon)
-        # cv2.imshow('diff', diff)
-        # cv2.waitKey(0)
-        res = []
-        for u in diff:
-            res.append(sum(u))
-        # print('second', sum(res) / (38 * 38 * 255))
-        coincidence = sum(res) / (138 * 138 * 255)
-        # cv2.putText(frame, str(coincidence), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
-        return coincidence
-    return 0
+def template(img, model):
+    image1 = cv2.resize(img, (32, 32)) / 255
+    image1 = np.expand_dims(image1,
+                            axis=0)  # сеть принимает на вход изображение с добавленным измерением, посмотрите как меняется форма массива после этой команды
+    pred = model.predict(image1)
+
+    class_names = [0, 1]
+    class_index = np.argmax(pred[0])
+    res = class_names[class_index]
+    # if not isinstance(res, int):
+    #     img = cv2.resize(img_thresh, (138, 138), None, 0.5, 0.5)
+    #     etalon = cv2.imread('1.png', 0)
+    #     etalon = cv2.resize(etalon, (138, 138), None, 0.5, 0.5)
+    #     diff = 255 - cv2.absdiff(img, etalon)
+    #     # cv2.imshow('diff', diff)
+    #     # cv2.waitKey(0)
+    #     res = []
+    #     for u in diff:
+    #         res.append(sum(u))
+    #     # print('second', sum(res) / (38 * 38 * 255))
+    #     coincidence = sum(res) / (138 * 138 * 255)
+    #     # cv2.putText(frame, str(coincidence), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
+    #     return coincidence
+    return res
 
 
 def detect_defective_parts(video) -> list:
@@ -54,6 +63,7 @@ def detect_defective_parts(video) -> list:
     """
 
     i = 0
+    model = keras.models.load_model("MultiClas_Conv_v2.h5")
     nuts = dict()
     nuts_img = []
     coincidence = dict()
@@ -63,7 +73,7 @@ def detect_defective_parts(video) -> list:
         if not status:  # выходим из цикла, если видео закончилось
             break
 
-        frame = cv2.resize(frame, (0, 0), None, 0.5, 0.5)
+        # frame = cv2.resize(frame, (0, 0), None, 0.5, 0.5)
         frame = cv2.flip(frame, 0)
 
         blurred_frame = cv2.GaussianBlur(frame, (7, 7), 8)
@@ -92,14 +102,15 @@ def detect_defective_parts(video) -> list:
             for old_num_id, old_bbox in nuts.items():
                 if intersects(bbox, old_bbox):
                     num_id = old_num_id
-                    nut = thresh[y:y2, x:x2]
+                    nut = frame[y:y2, x:x2]
+                    nut_thresh = thresh[y:y2, x:x2]
                     # cv2.putText(frame, str(nut.shape), (x, y),
                     #             cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
-                    if num_id not in coincidence:
-                        coincidence[num_id] = [template(nut)]
-                    else:
-                        coincidence[num_id] = coincidence[num_id] + [
-                            template(nut)]
+                    # if num_id not in coincidence:
+                    #     coincidence[num_id] = [template(nut, model, nut_thresh)]
+                    # else:
+                    #     coincidence[num_id] = coincidence[num_id] + [
+                    #         template(nut, model, nut_thresh)]
                     nuts[num_id] = bbox
                     break
 
@@ -110,7 +121,7 @@ def detect_defective_parts(video) -> list:
 
             if num_id is not None and y >= zone_end:
                 nuts[num_id] = (-50, -50, -1, -1)
-                coincidence[num_id] = coincidence[num_id] + [template(nut)]
+                result.append(template(nut, model))
 
         # cv2.line(frame, (0, zone_start), (frame_w, zone_start), (0, 0, 255))
         # cv2.line(frame, (0, zone_end), (frame_w, zone_end), (0, 0, 255))
@@ -118,10 +129,11 @@ def detect_defective_parts(video) -> list:
         # if cv2.waitKey(1) == 27:
         #     cv2.destroyAllWindows()
         #     quit()
-    for value in coincidence.values():
-        m = np.array(value).mean()
-        print(m)
-        result.append(1 if m < 0.91 else 0)
 
-
+    # print(coincidence)
+    # for value in coincidence.values():
+    #     m = np.array(value).mean()
+    #     print(m)
+    #     result.append(1 if m > 0.91 else 0)
+    print(result)
     return result

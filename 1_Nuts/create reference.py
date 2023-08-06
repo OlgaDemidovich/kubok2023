@@ -47,7 +47,7 @@ def detect_defective_parts(video):
         if not status:  # выходим из цикла, если видео закончилось
             break
 
-        frame = cv2.resize(frame, (0, 0), None, 0.5, 0.5)
+        # frame = cv2.resize(frame, (0, 0), None, 0.5, 0.5)
         frame = cv2.flip(frame, 0)
 
         blurred_frame = cv2.GaussianBlur(frame, (7, 7), 8)
@@ -70,11 +70,11 @@ def detect_defective_parts(video):
             for old_num_id, old_bbox in nuts.items():
                 if intersects(bbox, old_bbox):
                     num_id = old_num_id
-                    nut = thresh[y:y2, x:x2]
+                    nut = frame[y:y2, x:x2]
                     class_name = real_label[num_id]
                     name = len([n for n in os.listdir('images/')])
-                    cv2.imwrite(f'images/{name}', nut)
-
+                    cv2.imwrite(f'images/{name}.jpg', nut)
+                    file_writer.writerow([f'images/{name}.jpg', class_name])
                     nuts[num_id] = bbox
                     break
 
@@ -89,18 +89,19 @@ def detect_defective_parts(video):
 
 with open("annotations_nuts.csv", mode="w", encoding='utf-8') as w_file:
     file_writer = csv.writer(w_file, delimiter=",", lineterminator="\r")
-    file_writer.writerow(["", "Класс", "Возраст"])
-csv_file = "annotations.csv"
-data = pd.read_csv(csv_file, sep=',', dtype=str)
-data = data.sample(frac=1)
+    file_writer.writerow(["image", "class"])
 
-for i, row in enumerate(data.itertuples()):
-    row_id, video_filename, real_label = row
+    csv_file = "annotations.csv"
+    data = pd.read_csv(csv_file, sep=',', dtype=str)
+    data = data.sample(frac=1)
 
-    print(video_filename)
-    # convert string of 0 and 1 to list
-    real_label = list(map(int, list(real_label)))
+    for i, row in enumerate(data.itertuples()):
+        row_id, video_filename, real_label = row
 
-    video = cv2.VideoCapture(video_filename)
-    detect_defective_parts(video)
-    video.release()
+        print(video_filename)
+        # convert string of 0 and 1 to list
+        real_label = list(map(int, list(real_label)))
+
+        video = cv2.VideoCapture(video_filename)
+        detect_defective_parts(video)
+        video.release()
