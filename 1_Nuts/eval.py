@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 from tensorflow import keras
 
-
 def intersects(bbox1, bbox2):
     x, y, w, h = bbox1
     bbox1 = (x, y, x + w, y + h)
@@ -18,9 +17,9 @@ def intersects(bbox1, bbox2):
 
 def template(img, model):
     image1 = cv2.resize(img, (32, 32)) / 255
-    image1 = np.expand_dims(image1,
-                            axis=0)  # сеть принимает на вход изображение с добавленным измерением, посмотрите как меняется форма массива после этой команды
+    image1 = np.expand_dims(image1, axis=0)
     pred = model.predict(image1)
+    print(pred)
 
     class_names = [0, 1]
     class_index = np.argmax(pred[0])
@@ -39,6 +38,7 @@ def template(img, model):
     #     coincidence = sum(res) / (138 * 138 * 255)
     #     # cv2.putText(frame, str(coincidence), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
     #     return coincidence
+
     return res
 
 
