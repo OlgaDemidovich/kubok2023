@@ -3,11 +3,11 @@ import os
 import cv2
 import dlib
 
-dir = r'D:/inbox/Документы/Документы/__Python__/kubok2023/2_Logo/'
+dir = r'/kubok2023/2_Logo/'
 # dir = r'kubok2023/2_Logo'
 
 
-csv_file = "annotations.csv"
+csv_file = "../2_Logo/annotations.csv"
 data = pd.read_csv(csv_file, sep=',')
 data = data.sample(frac=1)
 names = {'cpp': 0, 'python': 1, 'kruzhok': 2, 'altair': 3, 'avt': 4}

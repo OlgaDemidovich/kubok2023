@@ -3,6 +3,7 @@ import pandas as pd
 import csv
 import os
 
+
 # for i in range(1, 7):
 #     name = f'{i}.png'
 #     frame = cv2.imread('reference/'+name)
@@ -36,10 +37,41 @@ def intersects(bbox1, bbox2):
     return inter_area > 0
 
 
+def save_file(path, class_name, image):
+    cv2.imwrite(path, image)
+    file_writer.writerow([path, class_name])
+    img = [path, image]
+
+    path = path.replace('.jpg', '')
+
+    horPath = path + "_horflip.jpg"
+    horflip = cv2.flip(image, 1)
+    cv2.imwrite(horPath, horflip)
+    file_writer.writerow([horPath, class_name])
+    hor = [horPath, horflip]
+
+    verPath = path + "_verflip.jpg"
+    verflip = cv2.flip(image, 0)
+    cv2.imwrite(verPath, verflip)
+    file_writer.writerow([verPath, class_name])
+    ver = [verPath, verflip]
+
+    invPath = path + "_invflip.jpg"
+    invflip = cv2.flip(image, -1)
+    cv2.imwrite(invPath, invflip)
+    file_writer.writerow([invPath, class_name])
+    inv = [invPath, invflip]
+
+    for dark_path, dark_image in [img, hor, ver, inv]:
+        darkPath = dark_path + "_dark.jpg"
+        darkImage = dark_image // 2
+        cv2.imwrite(darkPath, darkImage)
+        file_writer.writerow([darkPath, class_name])
+
+
 def detect_defective_parts(video):
     i = 0
     nuts = dict()
-    nuts_img = []
     coincidence = dict()
     result = []  # пустой список для засенения результата
     while True:  # цикл чтения кадров из видео
@@ -65,26 +97,27 @@ def detect_defective_parts(video):
             x, y, w, h = bbox
             x2, y2 = x + w, y + h
 
-            nut = None
+            nut = frame[y:y2, x:x2]
             num_id = None
             for old_num_id, old_bbox in nuts.items():
                 if intersects(bbox, old_bbox):
                     num_id = old_num_id
-                    nut = frame[y:y2, x:x2]
-                    class_name = real_label[num_id]
-                    name = len([n for n in os.listdir('images/')])
-                    cv2.imwrite(f'images/{name}.jpg', nut)
-                    file_writer.writerow([f'images/{name}.jpg', class_name])
                     nuts[num_id] = bbox
+                    class_name = real_label[num_id]
                     break
 
+            name = len(os.listdir('images/'))//8
+            path = f'images/{name}.jpg'
             if num_id is None and y2 > zone_start and y < zone_end:
                 num_id = len(nuts)
+                class_name = real_label[num_id]
                 nuts[num_id] = bbox
-                nuts_img.append(nut)
+                save_file(path, class_name, nut)
 
             if num_id is not None and y >= zone_end:
                 nuts[num_id] = (-50, -50, -1, -1)
+
+                save_file(path, class_name, nut)
 
 
 with open("annotations_nuts.csv", mode="w", encoding='utf-8') as w_file:

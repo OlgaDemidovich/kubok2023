@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 from tensorflow import keras
 
+model = keras.models.load_model("MultiClas_Conv_v6.h5")
+
 
 def intersects(bbox1, bbox2):
     x, y, w, h = bbox1
@@ -16,29 +18,28 @@ def intersects(bbox1, bbox2):
     return inter_area > 0
 
 
-def template(img, model):
+def template(img, img_thresh):
     image1 = cv2.resize(img, (32, 32)) / 255
-    image1 = np.expand_dims(image1,
-                            axis=0)  # сеть принимает на вход изображение с добавленным измерением, посмотрите как меняется форма массива после этой команды
+    image1 = np.expand_dims(image1, axis=0)
     pred = model.predict(image1)
+    res = 1 if pred[0, 1] > pred[0, 0] else 0
+    # res = pred[0, 1]
 
-    class_names = [0, 1]
-    class_index = np.argmax(pred[0])
-    res = class_names[class_index]
-    # if not isinstance(res, int):
-    #     img = cv2.resize(img_thresh, (138, 138), None, 0.5, 0.5)
-    #     etalon = cv2.imread('1.png', 0)
-    #     etalon = cv2.resize(etalon, (138, 138), None, 0.5, 0.5)
-    #     diff = 255 - cv2.absdiff(img, etalon)
-    #     # cv2.imshow('diff', diff)
-    #     # cv2.waitKey(0)
-    #     res = []
-    #     for u in diff:
-    #         res.append(sum(u))
-    #     # print('second', sum(res) / (38 * 38 * 255))
-    #     coincidence = sum(res) / (138 * 138 * 255)
-    #     # cv2.putText(frame, str(coincidence), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
-    #     return coincidence
+    # img = cv2.resize(img_thresh, (138, 138), None, 0.5, 0.5)
+    # etalon = cv2.imread('1.png', 0)
+    # etalon = cv2.resize(etalon, (138, 138), None, 0.5, 0.5)
+    # diff = 255 - cv2.absdiff(img, etalon)
+    # # cv2.imshow('diff', diff)
+    # # cv2.waitKey(0)
+    # result = []
+    # for u in diff:
+    #     result.append(sum(u))
+    # # print('second', sum(res) / (38 * 38 * 255))
+    # coincidence = sum(result) / (138 * 138 * 255)
+    # # cv2.putText(frame, str(coincidence), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
+    # res = coincidence
+    # print(res)
+    # res = 0 if res > 0.92 else 1
     return res
 
 
@@ -63,9 +64,8 @@ def detect_defective_parts(video) -> list:
     """
 
     i = 0
-    model = keras.models.load_model("MultiClas_Conv_v2.h5")
+
     nuts = dict()
-    nuts_img = []
     coincidence = dict()
     result = []  # пустой список для засенения результата
     while True:  # цикл чтения кадров из видео
@@ -117,11 +117,10 @@ def detect_defective_parts(video) -> list:
             if num_id is None and y2 > zone_start and y < zone_end:
                 num_id = len(nuts)
                 nuts[num_id] = bbox
-                nuts_img.append(nut)
 
             if num_id is not None and y >= zone_end:
                 nuts[num_id] = (-50, -50, -1, -1)
-                result.append(template(nut, model))
+                result.append(template(nut, nut_thresh))
 
         # cv2.line(frame, (0, zone_start), (frame_w, zone_start), (0, 0, 255))
         # cv2.line(frame, (0, zone_end), (frame_w, zone_end), (0, 0, 255))
@@ -135,5 +134,4 @@ def detect_defective_parts(video) -> list:
     #     m = np.array(value).mean()
     #     print(m)
     #     result.append(1 if m > 0.91 else 0)
-    print(result)
     return result
