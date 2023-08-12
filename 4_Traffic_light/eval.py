@@ -24,7 +24,7 @@ def load_models():
 
     # Пример загрузки моделей из файлов
     # Yolo-модели
-    net = cv2.dnn.readNetFromDarknet('yolo.cfg', 'yolo_best.weights')
+    net = cv2.dnn.readNetFromDarknet('yolo_people_signs_lights.cfg', 'yolo_people_signs_lights.weights')
     yolo_model = cv2.dnn_DetectionModel(net)
     yolo_model.setInputParams(scale=1 / 255, size=(416, 416), swapRB=True)
     models = [yolo_model]
