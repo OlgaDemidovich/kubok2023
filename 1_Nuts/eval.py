@@ -41,7 +41,7 @@ def template(img, img_thresh):
     # cv2.putText(frame, str(coincidence), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
     res = coincidence
     print(res)
-    res = 0 if res > 0.91 else 1
+    res = 0 if res > 0.909 else 1
     return res
 
 
@@ -115,7 +115,6 @@ def detect_defective_parts(video) -> list:
                     #         template(nut, model, nut_thresh)]
                     nuts[num_id] = bbox
                     break
-
             if num_id is None and y2 > zone_start and y < zone_end:
                 num_id = len(nuts)
                 nuts[num_id] = bbox
