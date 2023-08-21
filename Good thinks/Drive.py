@@ -126,7 +126,7 @@ class_names = ["Road works", "Parking", "No entry", "Pedestrian crossing",
 
 for i in range(20):
     status, frame = cap.read()
-    classes, scores, boxes = yolo_model.detect(frame)
+    classes, scores, boxes = yolo_model.detect(frame, nmsThreshold=0.5)
     print(class_names[classes[0]])
     # if status:
     #     get_angle()

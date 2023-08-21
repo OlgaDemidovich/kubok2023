@@ -33,11 +33,11 @@ def IoU(user_box, true_box):
 # cap = cv2.VideoCapture(0)
 
 # net = cv2.dnn.readNetFromDarknet('yolo.cfg', 'yolo_best.weights')
-net = cv2.dnn.readNetFromDarknet('yolo_people_signs_lights_.cfg',
+net = cv2.dnn.readNetFromDarknet('yolo_people_signs_lights.cfg',
                                  'yolo_people_signs_lights.weights')
 yolo_model = cv2.dnn_DetectionModel(net)
 yolo_model.setInputParams(scale=1 / 255, size=(416, 416), swapRB=True)
-models = [yolo_model]
+
 class_names = ["Road works", "Parking", "No entry", "Pedestrian crossing",
                "Movement prohibition", "Artificial roughness", "Give way",
                "Stop", 'Person', 'Lights']
@@ -47,18 +47,9 @@ images = ['1.jpg', '32.jpg', '112.jpg', '1016.jpg', '1290.jpg', '1443.jpg', '144
 for img in images:
     # status, frame = cap.read()
     frame = cv2.imread(img)
-    classes, scores, boxes = yolo_model.detect(frame)
-    indexes = [0]
+    classes, scores, boxes = yolo_model.detect(frame, nmsThreshold=0.5)
     cl_sc_box = list(zip(classes, scores, boxes))
-    for ind in range(1, len(cl_sc_box)):
-        cl, score, bbox = cl_sc_box[ind - 1]
-        cl2, score2, bbox2 = cl_sc_box[ind]
-        iou = IoU(bbox, bbox2)
-        print(iou)
-        if iou < 0.1:
-            indexes.append(ind)
-    for index in indexes:
-        cl, score, bbox = cl_sc_box[index]
+    for (cl, score, bbox) in cl_sc_box:
         x, y, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 0), 2)
         cv2.putText(frame, class_names[cl], (x, y - 10),

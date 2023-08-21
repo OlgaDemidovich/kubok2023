@@ -62,11 +62,11 @@ def save_file(path, class_name, image):
     file_writer.writerow([invPath, class_name])
     inv = [invPath, invflip]
 
-    for dark_path, dark_image in [img, hor, ver, inv]:
-        darkPath = dark_path + "_dark.jpg"
-        darkImage = dark_image // 2
-        cv2.imwrite(darkPath, darkImage)
-        file_writer.writerow([darkPath, class_name])
+    # for dark_path, dark_image in [img, hor, ver, inv]:
+    #     darkPath = dark_path + "_dark.jpg"
+    #     darkImage = dark_image // 2
+    #     cv2.imwrite(darkPath, darkImage)
+    #     file_writer.writerow([darkPath, class_name])
 
 
 def detect_defective_parts(video):
@@ -97,26 +97,30 @@ def detect_defective_parts(video):
             x, y, w, h = bbox
             x2, y2 = x + w, y + h
 
-            nut = frame[y:y2, x:x2]
+            # nut = frame[y:y2, x:x2]
+            nut = thresh[y:y2, x:x2]
             num_id = None
+            name = len(os.listdir('images/')) // 4
+            path = f'images/{name}.jpg'
             for old_num_id, old_bbox in nuts.items():
                 if intersects(bbox, old_bbox):
                     num_id = old_num_id
                     nuts[num_id] = bbox
                     class_name = real_label[num_id]
+
                     break
 
-            name = len(os.listdir('images/'))//8
-            path = f'images/{name}.jpg'
             if num_id is None and y2 > zone_start and y < zone_end:
                 num_id = len(nuts)
                 class_name = real_label[num_id]
                 nuts[num_id] = bbox
                 save_file(path, class_name, nut)
 
+            if y2 == int(frame_h * 0.5):
+                save_file(path, class_name, nut)
+
             if num_id is not None and y >= zone_end:
                 nuts[num_id] = (-50, -50, -1, -1)
-
                 save_file(path, class_name, nut)
 
 

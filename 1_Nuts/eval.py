@@ -2,8 +2,7 @@ import cv2
 import numpy as np
 from tensorflow import keras
 
-
-# model = keras.models.load_model("MultiClas_Conv_v6.h5")
+model = keras.models.load_model("MultiClas_Conv_v6.h5")
 
 
 def intersects(bbox1, bbox2):
@@ -20,15 +19,16 @@ def intersects(bbox1, bbox2):
 
 
 def template(img, img_thresh):
-    # image1 = cv2.resize(img, (32, 32)) / 255
-    # image1 = np.expand_dims(image1, axis=0)
-    # pred = model.predict(image1)
+    # img = cv2.cvtColor(img_thresh, cv2.COLOR_GRAY2BGR)
+    image1 = cv2.resize(img, (32, 32)) / 255
+    image1 = np.expand_dims(image1, axis=0)
+    pred = model.predict(image1)
+    res = 1 - pred[0, 0] + pred[0, 1]
     # res = 1 if pred[0, 1] > pred[0, 0] else 0
-    # res = pred[0, 1]
-    w, h = img_thresh.shape
+    # print(res)
 
     img = cv2.resize(img_thresh, (138, 138), None, 0.5, 0.5)
-    etalon = cv2.imread('1.png', 0)
+    etalon = cv2.imread('4.png', 0)
     etalon = cv2.resize(etalon, (138, 138), None, 0.5, 0.5)
     diff = 255 - cv2.absdiff(img, etalon)
     # cv2.imshow('diff', diff)
@@ -39,9 +39,9 @@ def template(img, img_thresh):
     # print('second', sum(res) / (38 * 38 * 255))
     coincidence = sum(result) / (138 * 138 * 255)
     # cv2.putText(frame, str(coincidence), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0))
-    res = coincidence
-    print(res)
-    res = 0 if res > 0.909 else 1
+    res += (coincidence - 0.1) * 9
+    # print(res/2)
+    # res = 1 if res / 2 > 0.5 else 0
     return res
 
 
@@ -135,4 +135,7 @@ def detect_defective_parts(video) -> list:
     #     m = np.array(value).mean()
     #     print(m)
     #     result.append(1 if m > 0.91 else 0)
+    print([i / 2 for i in result])
+    result = [1 if i / 2 > 0.7 else 0 for i in result]
+    print(result)
     return result
