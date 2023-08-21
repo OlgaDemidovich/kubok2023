@@ -35,31 +35,24 @@ def get_angle():
     angle = min([angle, 108])
 
 
-def detect(frame, model_detector):
-    boxes = model_detector(frame)
-
-    for box in boxes:
-        (x, y, x2, y2) = [box.left(), box.top(), box.right(), box.bottom()]
-        frame_detect = frame[y:y2, x:x2]
-        gray = cv2.cvtColor(frame_detect, cv2.COLOR_BGR2GRAY)
-        binary = cv2.inRange(gray, 240, 255)
-        if binary.shape[0] == 0 and binary.shape[1] == 0:
-            continue
-        frame_res = cv2.resize(binary, (60, 60))
-        frame_res = frame_res[:, 10:50]
-        print(frame_res)
-        red = np.sum(frame_res[5:15, :])
-        yellow = np.sum(frame_res[25:35, :])
-        green = np.sum(frame_res[45:55, :])
-        print(red, yellow, green)
-        if green > 400000:
-            return 'green'
-        elif red > 750000 and yellow > 600000:
-            return 'red and yellow'
-        elif red > 750000:
-            return 'red'
-        elif yellow > 600000:
-            return 'yellow'
+def detect_light(frame_light):
+    gray = cv2.cvtColor(frame_light, cv2.COLOR_BGR2GRAY)
+    binary = cv2.inRange(gray, 240, 255)
+    frame_res = cv2.resize(binary, (60, 60))
+    # frame_res = frame_res[:, 10:50]
+    cv2.imshow('fr', frame_res)
+    print(frame_res)
+    red = np.sum(frame_res[5:15, :])
+    yellow = np.sum(frame_res[25:35, :])
+    green = np.sum(frame_res[45:55, :])
+    print(red, yellow, green)
+    ind = np.argmax([red, yellow, green])
+    if ind == 2:
+        return 'green'
+    elif ind == 0:
+        return 'red'
+    elif ind == 1:
+        return 'yellow'
     return 'none'
 
 
@@ -99,8 +92,6 @@ src_draw = np.array(TRAP, dtype=np.int32)
 last = 0
 color = 'none'
 
-# model_detector = dlib.simple_object_detector('Detector_svetofor.svm')
-
 pi, ESC, STEER = setup_gpio()
 angle = 90
 
@@ -109,24 +100,26 @@ time.sleep(1.5)
 
 cap = cv2.VideoCapture(0)
 
-net = cv2.dnn.readNetFromDarknet('yolo.cfg', 'yolo_best.weights')
+net = cv2.dnn.readNetFromDarknet('yolo_people_signs_lights.cfg',
+                                 'yolo_people_signs_lights.weights')
 yolo_model = cv2.dnn_DetectionModel(net)
 yolo_model.setInputParams(scale=1 / 255, size=(416, 416), swapRB=True)
 models = yolo_model
 class_names = ["Road works", "Parking", "No entry", "Pedestrian crossing",
                "Movement prohibition", "Artificial roughness", "Give way",
                "Stop", 'Person', 'Lights']
-# while True:
-#     status, frame = cap.read()
-#     if color != 'green':
-#         color = detect(frame, model_detector)
-#         print(color)
-#         continue
-#     break
 
 for i in range(20):
     status, frame = cap.read()
     classes, scores, boxes = yolo_model.detect(frame, nmsThreshold=0.5)
+    for (cl, score, bbox) in list(zip(classes, scores, boxes)):
+        if class_names[cl] == 'Lights':
+            x, y, w, h = int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])
+            color = detect_light(frame[y:y + h, x:x + w])
+            print(color)
+            if color == 'green':
+                status = True
+
     print(class_names[classes[0]])
     # if status:
     #     get_angle()
