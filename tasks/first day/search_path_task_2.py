@@ -63,7 +63,7 @@ reverse_graph = {5: 0, 15: 1, 7: 2, 18: 3, 1: 4, 12: 5, 3: 6, 8: 7, 10: 8, 6: 9,
 ind_per = ['05', '27', '41', '63']
 
 
-img = cv2.imread('Pub_NSK_Cup23_OflineChapter/images_2_task/1.png')
+img = cv2.imread('Pub_NSK_Cup23_OflineChapter/images_2_task/2.png')
 
 end_x, end_y = get_end_point_coordinates(img)
 start_x, start_y = get_start_point_coordinates(img)
